@@ -20,7 +20,11 @@
 
 import {Graph} from '../common/input_graph';
 import {GroupNode, ModelGraph} from '../common/model_graph';
-import {NodeDataProviderRunData, ShowOnNodeItemData} from '../common/types';
+import {
+  LayoutDirection,
+  NodeDataProviderRunData,
+  ShowOnNodeItemData,
+} from '../common/types';
 import {
   getDeepestExpandedGroupNodeIds,
   isGroupNode,
@@ -67,6 +71,7 @@ self.addEventListener('message', (event: Event) => {
         workerEvent.flattenLayers,
         workerEvent.keepLayersWithASingleChild,
         workerEvent.initialLayout,
+        workerEvent.layoutDirectionOverride,
       );
       cacheModelGraph(modelGraph, workerEvent.paneId);
       const resp: ProcessGraphResponse = {
@@ -229,6 +234,8 @@ function handleProcessGraph(
   flattenLayers?: boolean,
   keepLayersWithASingleChild?: boolean,
   initialLayout?: boolean,
+  // Modified by Intel Corporation, 2026: added for the layout direction toggle.
+  layoutDirectionOverride?: LayoutDirection,
 ): ModelGraph {
   let error: string | undefined = undefined;
 
@@ -243,6 +250,7 @@ function handleProcessGraph(
     false,
     flattenLayers,
     keepLayersWithASingleChild,
+    layoutDirectionOverride,
   );
   const modelGraph = processor.process();
 

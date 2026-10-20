@@ -30,6 +30,7 @@ import {
 } from '../common/model_graph';
 import {
   KeyValuePairs,
+  LayoutDirection,
   MetadataItem,
   NodeAttributeList,
   NodeAttributePairs,
@@ -75,6 +76,10 @@ export class GraphProcessor {
     private readonly testMode = false,
     private readonly flattenLayers = false,
     private readonly keepLayersWithASingleChild = false,
+    // The direction every layer is laid out in, ahead of the graph's own
+    // groupNodeConfigs; unset keeps the graph's own directions.
+    // Modified by Intel Corporation, 2026: added for the layout direction toggle.
+    private readonly layoutDirectionOverride?: LayoutDirection,
   ) {
     this.nodeLabelsToHide = new Set<string>(
       (this.graph.nodeLabelsToHide ?? this.config?.nodeLabelsToHide ?? []).map(
@@ -754,6 +759,18 @@ export class GraphProcessor {
     }
     if (this.graph.groupNodeConfigs) {
       modelGraph.groupNodeConfigs = this.graph.groupNodeConfigs;
+    }
+    // getLayoutDirection uses the first config whose regex matches, so a
+    // match-all config placed first sets every layer's direction. It has no
+    // colors, and the layer color lookups skip configs without one, so existing
+    // layer colors still apply.
+    //
+    // Modified by Intel Corporation, 2026: added for the layout direction toggle.
+    if (this.layoutDirectionOverride != null) {
+      modelGraph.groupNodeConfigs = [
+        {namespaceRegex: '.*', layoutDirection: this.layoutDirectionOverride},
+        ...(modelGraph.groupNodeConfigs ?? []),
+      ];
     }
     if (this.graph.layoutConfigs) {
       modelGraph.layoutConfigs = this.graph.layoutConfigs;

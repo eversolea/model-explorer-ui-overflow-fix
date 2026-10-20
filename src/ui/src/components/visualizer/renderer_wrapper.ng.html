@@ -118,6 +118,31 @@ limitations under the License.
         </ng-template>
       }
 
+      <!-- Layout direction. Modified by Intel Corporation, 2026: added. -->
+      @if (showLayoutDirectionToggle) {
+        <div class="mat-icon-container layout-direction"
+            [bubble]="helpLayoutDirection"
+            [overlaySize]="helpPopupSize"
+            [hoverDelayMs]="10"
+            [class.enabled]="layoutLeftToRight"
+            (click)="handleClickToggleLayoutDirection()">
+          <mat-icon class="toolbar-icon layout-direction">rotate_90_degrees_ccw</mat-icon>
+        </div>
+        <div class="vertical-divider"></div>
+        <ng-template #helpLayoutDirection>
+          <div class="model-explorer-help-popup">
+            @if (layoutLeftToRight) {
+              <span>Lay out the graph top to bottom</span>
+            } @else {
+              <span>Lay out the graph left to right</span>
+            }
+            <div class="description">
+              Applies to every layer until the graph is reloaded
+            </div>
+          </div>
+        </ng-template>
+      }
+
       <!-- Trace IO -->
       <div class="mat-icon-container trace-io"
           [bubble]="helpTraceIO"
