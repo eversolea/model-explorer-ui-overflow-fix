@@ -554,6 +554,10 @@ export interface Pane {
   snapshots?: Record<string, SnapshotData[]>;
   // Whether to flatten all layers (ignore namespaces in node).
   flattenLayers?: boolean;
+  // The layout direction applied to every layer, overriding the graph's own
+  // groupNodeConfigs. Unset means the graph's own directions apply.
+  // Modified by Intel Corporation, 2026: added for the layout direction toggle.
+  layoutDirectionOverride?: LayoutDirection;
   snapshotToRestore?: SnapshotData;
   subgraphBreadcrumbs?: SubgraphBreadcrumbItem[];
   searchResults?: SearchResults;

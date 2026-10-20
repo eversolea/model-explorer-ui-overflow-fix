@@ -38,6 +38,7 @@ import {
   Command,
   DownloadAsPngInfo,
   ExpandOrCollapseAllGraphLayersInfo,
+  LayoutDirection,
   LocateNodeInfo,
   ModelGraphProcessedEvent,
   NodeInfo,
@@ -396,6 +397,8 @@ export class AppService {
       groupNodeChildrenCountThreshold:
         this.getGroupNodeChildrenCountThreshold(),
       flattenLayers,
+      // Modified by Intel Corporation, 2026: keep the pane's layout direction.
+      layoutDirectionOverride: this.getLayoutDirectionOverride(paneId),
       keepLayersWithASingleChild: this.config()?.keepLayersWithASingleChild,
       initialLayout,
     };
@@ -435,10 +438,29 @@ export class AppService {
       groupNodeChildrenCountThreshold:
         this.getGroupNodeChildrenCountThreshold(),
       flattenLayers,
+      // Modified by Intel Corporation, 2026: keep the pane's layout direction.
+      layoutDirectionOverride: this.getLayoutDirectionOverride(paneId),
       keepLayersWithASingleChild: this.config()?.keepLayersWithASingleChild,
       initialLayout,
     };
     this.workerService.worker.postMessage(processGraphReq);
+  }
+
+  // Modified by Intel Corporation, 2026: added for the layout direction toggle.
+  setLayoutDirectionOverride(paneId: string, direction: LayoutDirection) {
+    const pane = this.getPaneById(paneId);
+    if (!pane) {
+      return;
+    }
+    this.panes.update((panes) => {
+      pane.layoutDirectionOverride = direction;
+      return [...panes];
+    });
+  }
+
+  /** Returns the pane's layout direction override, or undefined if unset. */
+  getLayoutDirectionOverride(paneId: string): LayoutDirection | undefined {
+    return this.getPaneById(paneId)?.layoutDirectionOverride;
   }
 
   setFlattenLayersInCurrentPane(flatten: boolean) {
@@ -1087,6 +1109,8 @@ export class AppService {
       groupNodeChildrenCountThreshold:
         this.getGroupNodeChildrenCountThreshold(),
       flattenLayers: curPane?.flattenLayers ?? false,
+      // Modified by Intel Corporation, 2026: keep the pane's layout direction.
+      layoutDirectionOverride: curPane?.layoutDirectionOverride,
       keepLayersWithASingleChild: this.config()?.keepLayersWithASingleChild,
       initialLayout: true,
       replace: true,

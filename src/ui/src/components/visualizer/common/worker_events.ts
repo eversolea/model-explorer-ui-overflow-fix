@@ -19,6 +19,7 @@
 import {Graph} from './input_graph';
 import {ModelGraph} from './model_graph';
 import {
+  LayoutDirection,
   NodeAttributePairs,
   NodeDataProviderRunData,
   NodeStylerRule,
@@ -60,6 +61,8 @@ export declare interface ProcessGraphRequest extends WorkerEventBase {
   paneId: string;
   groupNodeChildrenCountThreshold?: number;
   flattenLayers?: boolean;
+  // See Pane.layoutDirectionOverride. Modified by Intel Corporation, 2026.
+  layoutDirectionOverride?: LayoutDirection;
   keepLayersWithASingleChild?: boolean;
   initialLayout?: boolean;
   // Whether to replace the current graph.

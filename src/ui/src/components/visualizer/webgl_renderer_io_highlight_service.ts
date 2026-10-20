@@ -958,8 +958,11 @@ export class WebglRendererIoHighlightService {
    * Given source and target node id, find the edge in the given namespace that
    * connects to n1 and n2 where source node is within n1 and target node is
    * within n2.
+   *
+   * Modified by Intel Corporation, 2026: made public for edge overlays that
+   * recolor graph edges.
    */
-  private findEdgeConnectingTwoNodesInNamespace(
+  findEdgeConnectingTwoNodesInNamespace(
     namespace: string,
     sourceNodeId: string,
     targetNodeId: string,

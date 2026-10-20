@@ -431,6 +431,11 @@ export class WebglEdges {
       if (edgeIds.length > 0) {
         for (const edgeId of edgeIds) {
           const arrowHead = this.savedArrowHeads[edgeId];
+          // Modified by Intel Corporation, 2026: skip edges without an arrow
+          // head, as updateYOffsets does.
+          if (!arrowHead) {
+            continue;
+          }
           const index = arrowHead.index;
           colorAttr.setXYZ(index, color.r, color.g, color.b);
           this.lastColorUpdateArrowHeads.push(arrowHead);

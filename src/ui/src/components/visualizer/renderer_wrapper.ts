@@ -38,11 +38,12 @@ import {Bubble} from '../bubble/bubble';
 import {AppService} from './app_service';
 import {type ModelGraph} from './common/model_graph';
 import {
+  LayoutDirection,
   PopupPanelData,
   SelectedNodeInfo,
   SubgraphBreadcrumbItem,
 } from './common/types';
-import {isGroupNode} from './common/utils';
+import {getLayoutDirection, isGroupNode} from './common/utils';
 import {EdgeOverlaysDropdown} from './edge_overlays_dropdown';
 import {SearchBar} from './search_bar';
 import {SnapshotManager} from './snapshot_manager';
@@ -153,6 +154,26 @@ export class RendererWrapper {
     this.appService.curInitialUiState.set(undefined);
   }
 
+  // Flips the top-level layout direction for every layer and re-processes the
+  // graph, the way flatten layers does. Lasts until the pane is reloaded.
+  //
+  // Modified by Intel Corporation, 2026: added for the layout direction toggle.
+  handleClickToggleLayoutDirection() {
+    this.appService.setLayoutDirectionOverride(
+      this.paneId,
+      this.layoutLeftToRight
+        ? LayoutDirection.TOP_BOTTOM
+        : LayoutDirection.LEFT_RIGHT,
+    );
+    this.appService.processGraph(
+      this.paneId,
+      this.appService.getFlattenLayers(this.paneId),
+    );
+
+    // Clear init graph state.
+    this.appService.curInitialUiState.set(undefined);
+  }
+
   handleClickDownloadAsPng(fullGraph: boolean) {
     this.appService.downloadAsPngClicked.next({
       rendererId: this.rendererId,
@@ -194,6 +215,19 @@ export class RendererWrapper {
     return (
       !this.inPopup &&
       this.appService.config()?.toolbarConfig?.hideFlattenAllLayers !== true
+    );
+  }
+
+  // Modified by Intel Corporation, 2026: added for the layout direction toggle.
+  get showLayoutDirectionToggle(): boolean {
+    return !this.inPopup;
+  }
+
+  /** Returns whether the graph's top level is currently laid out left to right. */
+  get layoutLeftToRight(): boolean {
+    return (
+      this.modelGraph != null &&
+      getLayoutDirection(this.modelGraph, '') === LayoutDirection.LEFT_RIGHT
     );
   }
 

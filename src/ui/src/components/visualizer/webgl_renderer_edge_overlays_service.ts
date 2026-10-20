@@ -21,7 +21,7 @@ import * as three from 'three';
 import {WEBGL_ELEMENT_Y_FACTOR} from './common/consts';
 import {Edge, EdgeOverlay, ProcessedEdgeOverlay} from './common/edge_overlays';
 import {GroupNode, ModelEdge, OpNode} from './common/model_graph';
-import {getIntersectionPoints} from './common/utils';
+import {findCommonNamespace, getIntersectionPoints} from './common/utils';
 import {EdgeOverlaysService} from './edge_overlays_service';
 import {ThreejsService} from './threejs_service';
 import {WebglEdges} from './webgl_edges';
@@ -68,13 +68,70 @@ export class WebglRendererEdgeOverlaysService {
       return;
     }
 
-    // Find overlays that contain the node from the selected overlays.
+    // Find overlays that contain the node from the selected overlays. Overlays
+    // that recolor graph edges draw nothing here; see getRecoloredGraphEdges.
+    //
+    // Modified by Intel Corporation, 2026: skip recolorGraphEdges overlays.
     const selectedOverlays = this.edgeOverlaysService.selectedOverlays();
     for (const selectedOverlay of selectedOverlays) {
+      if (selectedOverlay.recolorGraphEdges) {
+        continue;
+      }
       if (selectedOverlay.nodeIds.has(selectedNodeId)) {
         this.curOverlays.push(selectedOverlay);
       }
     }
+  }
+
+  /**
+   * Returns, for each selected overlay with `recolorGraphEdges`, its color and
+   * the ids of the currently drawn graph edges that carry its edges.
+   *
+   * An overlay edge between two op nodes is carried by the drawn edge in their
+   * common namespace whose ends contain them, the same edge the selected-node
+   * highlight uses. Edges inside a collapsed layer are not drawn, so they map
+   * to nothing.
+   *
+   * Modified by Intel Corporation, 2026: added for critical path highlighting.
+   */
+  getRecoloredGraphEdges(): Array<{color: string; edgeIds: string[]}> {
+    const graph = this.webglRenderer.curModelGraph;
+    if (!graph) {
+      return [];
+    }
+    const recolorOverlays = this.edgeOverlaysService
+      .selectedOverlays()
+      .filter((overlay) => overlay.recolorGraphEdges);
+    if (recolorOverlays.length === 0) {
+      return [];
+    }
+
+    const drawnEdgeIds = new Set(
+      this.webglRenderer.edgesToRender.map(({edge}) => edge.id),
+    );
+    const ioHighlightService = this.webglRenderer.webglRendererIoHighlightService;
+    const result: Array<{color: string; edgeIds: string[]}> = [];
+    for (const overlay of recolorOverlays) {
+      const edgeIds = new Set<string>();
+      for (const {sourceNodeId, targetNodeId} of overlay.edges) {
+        const sourceNode = graph.nodesById[sourceNodeId] as OpNode | undefined;
+        const targetNode = graph.nodesById[targetNodeId] as OpNode | undefined;
+        if (!sourceNode || !targetNode) {
+          continue;
+        }
+        const drawnEdge =
+          ioHighlightService.findEdgeConnectingTwoNodesInNamespace(
+            findCommonNamespace(sourceNode.namespace, targetNode.namespace),
+            sourceNodeId,
+            targetNodeId,
+          );
+        if (drawnEdge && drawnEdgeIds.has(drawnEdge.id)) {
+          edgeIds.add(drawnEdge.id);
+        }
+      }
+      result.push({color: overlay.edgeColor, edgeIds: [...edgeIds]});
+    }
+    return result;
   }
 
   clearOverlaysData() {
