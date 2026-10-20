@@ -1,3 +1,9 @@
+# Changes to google main branch:
+Branch names:
+-left-to-right-enabling - 
+-critical-path-edge-overlays - 
+-ui-overflow-fix - Toolbar crowds (icons cropped, other icons moved out of toolbar boundaries) when the width of model explorer window is decreased. This should be fixed to ensure presentable GUI design
+
 # Model Explorer [![PyPI version](https://badge.fury.io/py/ai-edge-model-explorer.svg)](https://badge.fury.io/py/ai-edge-model-explorer) [![npm version](https://badge.fury.io/js/ai-edge-model-explorer-visualizer.svg)](https://badge.fury.io/js/ai-edge-model-explorer-visualizer)
 
 Model Explorer offers an intuitive and hierarchical visualization of model
