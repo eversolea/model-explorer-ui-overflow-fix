@@ -328,10 +328,6 @@ export class WebglRenderer implements OnInit, OnChanges, OnDestroy {
 
   private updateNodesStylesSavedSelectedNodeId = '';
   private updateNodesStylesSavedIoTracingData?: IoTracingData;
-  // The edge recoloring last applied by updateNodesStyles (as JSON), and the
-  // edges mesh it was applied to. Modified by Intel Corporation, 2026.
-  private updateNodesStylesSavedRecoloredEdges = '';
-  private updateNodesStylesSavedEdgesMesh?: unknown;
   private curSelectedRenderer?: RendererInfo;
   private portal: ComponentPortal<IoTree> | null = null;
   private showBusySpinnerTimeoutRef = -1;
@@ -698,18 +694,6 @@ export class WebglRenderer implements OnInit, OnChanges, OnDestroy {
           this.webglRendererEdgeOverlaysService.clearOverlaysEdges();
           this.webglRendererThreejsService.render();
         }
-      }
-
-      // Apply or remove the graph edge recoloring of overlays that do so (e.g.
-      // a critical path). Untracked so this effect only follows overlay
-      // selection, not the signals updateNodesStyles reads.
-      //
-      // Modified by Intel Corporation, 2026: added for critical path highlighting.
-      if (this.curModelGraph) {
-        untracked(() => {
-          this.updateNodesStyles();
-          this.webglRendererThreejsService.render();
-        });
       }
     });
 
@@ -3048,28 +3032,8 @@ export class WebglRenderer implements OnInit, OnChanges, OnDestroy {
     this.webglRendererEdgeTextsService.edgeTexts.restoreOpacities();
     this.groupNodeIcons.restoreOpacities();
     this.webglRendererAttrsTableService.attrsTableTexts.restoreOpacities();
-    // Graph edges recolored by edge overlays (e.g. a critical path). Reapplied
-    // whenever edge colors are restored, the recoloring changes, or the edges
-    // mesh was rebuilt by a relayout, which drops custom colors.
-    //
-    // Modified by Intel Corporation, 2026: added for critical path highlighting.
-    const recoloredEdges =
-      this.webglRendererEdgeOverlaysService.getRecoloredGraphEdges();
-    const recoloredEdgesJson = JSON.stringify(recoloredEdges);
-    let recoloredEdgesChanged = false;
-    if (
-      recoloredEdgesJson !== this.updateNodesStylesSavedRecoloredEdges ||
-      this.edges.edgesMesh !== this.updateNodesStylesSavedEdgesMesh
-    ) {
-      this.updateNodesStylesSavedRecoloredEdges = recoloredEdgesJson;
-      this.updateNodesStylesSavedEdgesMesh = this.edges.edgesMesh;
-      recoloredEdgesChanged = true;
-    }
-    if (selectedNodeIdChanged || ioTracingDataChanged || recoloredEdgesChanged) {
+    if (selectedNodeIdChanged || ioTracingDataChanged) {
       this.edges.restoreColors();
-      for (const {color, edgeIds} of recoloredEdges) {
-        this.edges.updateColors(edgeIds, new THREE.Color(color));
-      }
       this.webglRendererIdenticalLayerService.restoreOpacity();
     }
     this.edges.restoreYOffsets();

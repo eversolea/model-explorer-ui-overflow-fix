@@ -57,25 +57,6 @@ export declare interface EdgeOverlay {
   /** The width of the overlay edges. Default to 2. */
   edgeWidth?: number;
 
-  /**
-   * If set to `true`, the overlay draws no edges of its own. While it is
-   * selected in the edge overlays dropdown, the graph's existing edges along it
-   * are recolored to `edgeColor`, whether or not a node is selected. At any
-   * expansion level, an overlay edge recolors the drawn edge that carries it;
-   * one hidden inside a collapsed layer recolors nothing.
-   *
-   * Modified by Intel Corporation, 2026: added for critical path highlighting.
-   */
-  recolorGraphEdges?: boolean;
-
-  /**
-   * Whether the overlay is selected in the edge overlays dropdown when it is
-   * loaded. Default to `true`.
-   *
-   * Modified by Intel Corporation, 2026: added so a critical path starts off.
-   */
-  selectedOnLoad?: boolean;
-
   /** The font size of the edge labels. Default to 7.5. */
   edgeLabelFontSize?: number;
 

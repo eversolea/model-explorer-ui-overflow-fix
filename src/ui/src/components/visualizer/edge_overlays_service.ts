@@ -109,16 +109,14 @@ export class EdgeOverlaysService {
   addEdgeOverlayData(data: EdgeOverlaysData) {
     this.addOverlay(data);
 
-    // Select all newly-added overlays, except those with selectedOnLoad false.
-    //
-    // Modified by Intel Corporation, 2026: honor selectedOnLoad.
+    // Select all newly-added overlays.
     this.selectedOverlayIds.update((selectedOverlayIds) => {
       const allLoadedOverlaysDataList = this.allLoadedEdgeOverlays();
       const newOverlayData =
         allLoadedOverlaysDataList[allLoadedOverlaysDataList.length - 1];
-      const newIds = newOverlayData.processedOverlays
-        .filter((overlay) => overlay.selectedOnLoad !== false)
-        .map((overlay) => overlay.id);
+      const newIds = newOverlayData.processedOverlays.map(
+        (overlay) => overlay.id,
+      );
       return [...selectedOverlayIds, ...newIds];
     });
   }
