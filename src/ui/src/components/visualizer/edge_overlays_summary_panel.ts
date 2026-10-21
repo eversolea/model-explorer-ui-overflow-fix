@@ -50,7 +50,9 @@ interface OverlayRow {
   selector: 'edge-overlays-summary-panel',
   imports: [CommonModule, MatIconModule, MatTooltipModule],
   templateUrl: './edge_overlays_summary_panel.ng.html',
-  styleUrls: ['./edge_overlays_summary_panel.scss'],
+  // Reuses the node data provider run list's styles; the markup uses the same
+  // classes.
+  styleUrls: ['./node_data_provider_summary_panel.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EdgeOverlaysSummaryPanel {
