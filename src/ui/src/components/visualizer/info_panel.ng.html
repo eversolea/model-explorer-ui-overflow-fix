@@ -105,6 +105,19 @@ limitations under the License.
     }
   }
 
+  <!-- Edge overlays. Modified by Intel Corporation, 2026: added. -->
+  <div class="section" *ngIf="showEdgeOverlaysSummary" #edgeOverlaysSectionEle
+       [class.collapsed]="isSectionCollapsed(SectionLabel.EDGE_OVERLAYS)">
+    <div class="header" [style.font-size.px]="fontSize - 1">
+      <button mat-icon-button class="toggle"
+          (click)="handleToggleSection(SectionLabel.EDGE_OVERLAYS, edgeOverlaysSectionEle)">
+        <mat-icon>{{getSectionToggleIcon(SectionLabel.EDGE_OVERLAYS)}}</mat-icon>
+      </button>
+      {{SectionLabel.EDGE_OVERLAYS}}
+    </div>
+    <edge-overlays-summary-panel></edge-overlays-summary-panel>
+  </div>
+
   <!-- Summary for node data provider extensions -->
   <div class="section" *ngIf="showNodeDataProviderSummary" #ndpSectionEle
        [class.collapsed]="isSectionCollapsed(SectionLabel.NODE_DATA_PROVIDERS)">

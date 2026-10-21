@@ -84,7 +84,8 @@
 
     &.selected {
       opacity: 1;
-      cursor: default;
+      // Modified by Intel Corporation, 2026: a selected run can be hidden.
+      cursor: pointer;
 
       mat-icon {
         color: var(--me-warning-text-color);

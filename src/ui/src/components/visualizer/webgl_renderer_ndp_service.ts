@@ -47,6 +47,14 @@ import {LabelData, WebglTexts} from './webgl_texts';
 const NODE_DATA_PROVIDER_DISTRIBUTION_BAR_Y_OFFSET =
   WEBGL_ELEMENT_Y_FACTOR * 0.5;
 
+// How far the distribution bar sits inside its layer's edges, so it never
+// covers the border. The sides use the layers' corner radius (see nodeBodies in
+// webgl_renderer.ts), keeping the bar off the rounded corners; the bottom uses
+// the widest border a layer gets (when selected).
+// Modified by Intel Corporation, 2026: added.
+const NODE_DATA_PROVIDER_DISTRIBUTION_BAR_SIDE_INSET = 6;
+const NODE_DATA_PROVIDER_DISTRIBUTION_BAR_BOTTOM_INSET = 2;
+
 const THREE = three;
 
 /**
@@ -146,17 +154,20 @@ export class WebglRendererNdpService {
         if (bgColor === 'transparent') {
           continue;
         }
+        // Inset inside the layer's border. Modified by Intel Corporation, 2026.
+        const sideInset = NODE_DATA_PROVIDER_DISTRIBUTION_BAR_SIDE_INSET;
         const count = valueInfo.count;
-        const width = (count / countSum) * groupNodeWidth;
+        const width = (count / countSum) * (groupNodeWidth - 2 * sideInset);
         const height = NODE_DATA_PROVIDER_BG_COLOR_BAR_HEIGHT;
-        const x = widthSum;
+        const x = sideInset + widthSum;
 
         const barY =
           this.webglRenderer.getNodeY(groupNode) +
           this.webglRenderer.getNodeHeight(groupNode) -
           expandedSummaryHeight -
           NODE_DATA_PROVIDER_BG_COLOR_BAR_HEIGHT +
-          height / 2;
+          height / 2 -
+          NODE_DATA_PROVIDER_DISTRIBUTION_BAR_BOTTOM_INSET;
         rectangles.push({
           id: `${node.id}_${colorIndex}`,
           index: rectangles.length,

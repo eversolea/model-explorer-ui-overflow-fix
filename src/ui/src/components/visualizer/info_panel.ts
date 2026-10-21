@@ -76,6 +76,8 @@ import {InfoPanelService} from './info_panel_service';
 import {genIoTreeData, IoTree, TreeNode} from './io_tree';
 import {NodeDataProviderExtensionService} from './node_data_provider_extension_service';
 import {NodeDataProviderSummaryPanel} from './node_data_provider_summary_panel';
+import {EdgeOverlaysSummaryPanel} from './edge_overlays_summary_panel';
+import {EdgeOverlaysService} from './edge_overlays_service';
 import {Paginator} from './paginator';
 import {SplitPaneService} from './split_pane_service';
 import {
@@ -96,6 +98,8 @@ enum SectionLabel {
   LAYER_ATTRS = 'Layer attributes',
   ATTRIBUTES = 'Attributes',
   NODE_DATA_PROVIDERS = 'Node data providers',
+  // Modified by Intel Corporation, 2026: added.
+  EDGE_OVERLAYS = 'Edge overlays - Critical paths',
   IDENTICAL_GROUPS = 'Identical groups',
   INPUTS = 'inputs',
   OUTPUTS = 'outputs',
@@ -159,6 +163,7 @@ const DEFAULT_WIDTH = 370;
     Paginator,
     IoTree,
     NodeDataProviderSummaryPanel,
+    EdgeOverlaysSummaryPanel,
   ],
   providers: [InfoPanelService],
   templateUrl: './info_panel.ng.html',
@@ -247,6 +252,8 @@ export class InfoPanel {
   private savedWidth = 0;
 
   private readonly visualizerThemeService = inject(VisualizerThemeService);
+  // Modified by Intel Corporation, 2026: for the edge overlays section.
+  private readonly edgeOverlaysService = inject(EdgeOverlaysService);
 
   constructor(
     private readonly appService: AppService,
@@ -660,6 +667,20 @@ export class InfoPanel {
     );
   }
 
+  /**
+   * Returns whether to show the edge overlays section: when overlays are
+   * loaded and, like the node data providers section, no op is selected.
+   *
+   * Modified by Intel Corporation, 2026: added.
+   */
+  get showEdgeOverlaysSummary(): boolean {
+    return (
+      this.curModelGraph != null &&
+      (this.curSelectedNode == null || isGroupNode(this.curSelectedNode)) &&
+      this.edgeOverlaysService.filteredLoadedEdgeOverlays().length > 0
+    );
+  }
+
   get curSelectedNodeId(): string | undefined {
     return this.curSelectedNode ? this.curSelectedNode.id : undefined;
   }
@@ -710,7 +731,8 @@ export class InfoPanel {
   get nodeDataProviderPanelTitle(): string {
     return (
       this.appService.config()?.renameNodeDataProviderPanelTitleTo ??
-      SectionLabel.NODE_DATA_PROVIDERS
+      // Modified by Intel Corporation, 2026: name what the section holds.
+      `${SectionLabel.NODE_DATA_PROVIDERS} - Heatmap`
     );
   }
 

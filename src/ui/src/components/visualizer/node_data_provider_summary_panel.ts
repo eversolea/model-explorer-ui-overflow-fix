@@ -288,7 +288,7 @@ export class NodeDataProviderSummaryPanel implements OnChanges {
 
   getVisibleToggleTooltip(runItem: RunItem): string {
     return this.isRunItemSelected(runItem)
-      ? 'Visualizing in graph'
+      ? 'Visualizing in graph. Click to hide'
       : 'Click to visualize in graph';
   }
 
@@ -353,12 +353,12 @@ export class NodeDataProviderSummaryPanel implements OnChanges {
   handleClickToggleVisibility(runItem: RunItem, event: Event) {
     event.stopPropagation();
 
-    if (this.isRunItemSelected(runItem)) {
-      return;
-    }
+    // Clicking the visualized run hides it, so no run is visualized.
+    //
+    // Modified by Intel Corporation, 2026: toggle off instead of ignoring.
     this.appService.setSelectedNodeDataProviderRunId(
       this.paneId,
-      runItem.runId,
+      this.isRunItemSelected(runItem) ? undefined : runItem.runId,
     );
   }
 
